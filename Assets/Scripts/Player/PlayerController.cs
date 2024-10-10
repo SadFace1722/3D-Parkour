@@ -1,6 +1,5 @@
 using UnityEngine;
 using Cinemachine;
-using Unity.Android.Gradle.Manifest;
 
 public class PlayerController : MonoBehaviour
 {
