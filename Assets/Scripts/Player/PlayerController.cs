@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     {
         _isGrounded = _controller.isGrounded;
         _isMoving = _isGrounded && _Hor.sqrMagnitude > 0.1f;
-        _isFalling = _isGrounded && _Ver.sqrMagnitude > 0;
+        _isFalling = !_isGrounded && _Ver.sqrMagnitude > 0.1f;
         if (_isAlive)
         {
             HandleInput();
