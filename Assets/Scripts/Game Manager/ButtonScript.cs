@@ -1,22 +1,27 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ButtonScript : MonoBehaviour
 {
+    public bool _isActive;
+    [SerializeField] float _time;
     Animator _anim;
-    void Start()
+    private void Start()
     {
         _anim = GetComponent<Animator>();
     }
-
-    // Update is called once per frame
     void Update()
     {
-
+        animButton();
     }
+
     public void OpenOrClose()
     {
+        _isActive = !_isActive;
+    }
 
+    void animButton()
+    {
+        _anim.SetBool("Active", _isActive);
     }
 }

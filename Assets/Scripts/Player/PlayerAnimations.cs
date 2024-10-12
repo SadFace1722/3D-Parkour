@@ -5,13 +5,15 @@ using UnityEngine;
 public class PlayerAnimations : MonoBehaviour
 {
     [SerializeField] PlayerController _playerController;
-    [SerializeField] PickOrDropObject _pickOrDropObject;
+    [SerializeField] InteractObject _interactObject;
+    [SerializeField] PlayerState _state;
     Animator _anim;
     int _CarryIndexAnim;
     void Start()
     {
         _playerController = transform.parent.GetComponent<PlayerController>();
-        _pickOrDropObject = transform.parent.GetComponent<PickOrDropObject>();
+        _interactObject = transform.parent.GetComponent<InteractObject>();
+        _state = transform.parent.GetComponent<PlayerState>();
         _anim = GetComponent<Animator>();
         _CarryIndexAnim = _anim.GetLayerIndex("Carry");
     }
@@ -21,6 +23,7 @@ public class PlayerAnimations : MonoBehaviour
     {
         PlayerAnim();
         CarryAnim();
+        DeathAnim();
     }
     void PlayerAnim()
     {
@@ -42,7 +45,7 @@ public class PlayerAnimations : MonoBehaviour
     }
     void CarryAnim()
     {
-        if (_pickOrDropObject._currentObject != null)
+        if (_interactObject._currentObject != null)
         {
             _anim.SetLayerWeight(_CarryIndexAnim, 1);
         }
@@ -50,5 +53,9 @@ public class PlayerAnimations : MonoBehaviour
         {
             _anim.SetLayerWeight(_CarryIndexAnim, 0);
         }
+    }
+    void DeathAnim()
+    {
+        _anim.SetBool("Death", !_state._isAlive);
     }
 }

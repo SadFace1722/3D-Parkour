@@ -32,7 +32,7 @@ public class RayChecker : MonoBehaviour
         return Physics.Raycast(_ray.origin, _ray.direction, out _hitRay, _distanceRay, _layerMask);
     }
 
-    bool NearObject()
+    public bool NearObject()
     {
         float distanceToHitObject = Vector3.Distance(transform.parent.parent.position, _hitRay.point);
         return distanceToHitObject <= _distanceNearObject;
