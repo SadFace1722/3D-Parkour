@@ -28,6 +28,7 @@ public class CheckpointManager : MonoBehaviour
         positionData.userId = userId;
         positionData.x_position = position.x;
         positionData.y_position = position.y;
+        positionData.z_position = position.z;
 
         string jsonData = JsonUtility.ToJson(positionData); // Chuyển đổi dữ liệu thành JSON
 
@@ -61,4 +62,5 @@ public class PositionData
     public string userId;
     public float x_position;
     public float y_position;
+    public float z_position;
 }
