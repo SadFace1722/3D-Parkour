@@ -5,22 +5,24 @@ public class PlayerController : MonoBehaviour
     [SerializeField] PlayerState _state;
     [SerializeField] CharacterController _controller;
     [SerializeField] Camera _cam;
-    public bool _isGrounded, _isFalling, _isMoving, _isHideCursor;
+    [SerializeField] RayChecker _ray;
+    public bool _isGrounded, _isFalling, _isMoving, _isClimbing, _isHideCursor;
 
-    [SerializeField] float _moveSpeed, _jumpForce, _gravity;
+    [SerializeField] float _moveSpeed, _jumpForce, _gravity, _climpSpeed;
     float x, z;
-    [SerializeField] Vector3 _Hor, _Ver, _camR, _camF;
+    public Vector3 _Hor, _Ver, _camR, _camF;
 
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
         _cam = GameObject.Find("Main Camera").GetComponent<Camera>();
+        _ray = GameObject.Find("Main Camera").GetComponent<RayChecker>();
         _state = GetComponent<PlayerState>();
     }
 
     private void Update()
     {
-        if (_controller != null && _controller.enabled) // Kiểm tra nếu controller hoạt động
+        if (_controller != null && _controller.enabled)
         {
             _isGrounded = _controller.isGrounded;
             _isMoving = _isGrounded && _Hor.sqrMagnitude > 0.1f;
@@ -30,7 +32,8 @@ public class PlayerController : MonoBehaviour
             {
                 HandleInput();
                 HandleMove();
-                HandleGravity(); // Sửa tên từ HanldeGraviy thành đúng là HandleGravity
+                HandleGravity();
+                HandleClimb();
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     HandleJump();
@@ -77,12 +80,12 @@ public class PlayerController : MonoBehaviour
         {
             if (_Ver.y < 0)
             {
-                _Ver.y = -2f; // Đặt lại tốc độ rơi khi nhân vật tiếp đất
+                _Ver.y = -2f;
             }
         }
-        else
+        else if (!_isClimbing)
         {
-            _Ver.y -= _gravity * Time.deltaTime; // Áp dụng trọng lực
+            _Ver.y -= _gravity * Time.deltaTime;
         }
         _controller.Move(_Ver * Time.deltaTime);
     }
@@ -100,13 +103,40 @@ public class PlayerController : MonoBehaviour
         _isHideCursor = !_isHideCursor;
         if (_isHideCursor)
         {
-            Cursor.lockState = CursorLockMode.Locked; // Ẩn và khóa con trỏ
+            Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
         else
         {
-            Cursor.lockState = CursorLockMode.None; // Hiện con trỏ
+            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+        }
+    }
+
+
+    void HandleClimb()
+    {
+        if (Stair._instance.OnStair && _ray.CanTouchObject())
+        {
+            _isClimbing = true;
+            _Ver.y = 0;
+
+            if (z > 0)
+            {
+                _Ver.y = _climpSpeed;
+            }
+            else if (z < 0)
+            {
+                _Ver.y = -_climpSpeed;
+            }
+            else
+            {
+                _Ver.y = 0;
+            }
+        }
+        else
+        {
+            _isClimbing = false;
         }
     }
 }

@@ -21,13 +21,6 @@ public class Lava : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             _state.Death();
-            StartCoroutine(ResetLevel());
         }
-    }
-
-    IEnumerator ResetLevel()
-    {
-        yield return new WaitForSeconds(3.5f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

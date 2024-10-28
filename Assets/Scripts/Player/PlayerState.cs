@@ -4,10 +4,18 @@ using UnityEngine;
 
 public class PlayerState : MonoBehaviour
 {
+    public static PlayerState _instance;
     [SerializeField] int _health;
 
     [SerializeField] DragDoll _dragDoll;
     public bool _isAlive;
+    private void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+    }
     void Start()
     {
         _health = 100;
@@ -36,6 +44,12 @@ public class PlayerState : MonoBehaviour
     {
         _isAlive = false;
         _dragDoll.EnableRagdoll();
+        Invoke("RestartLevel", 3f);
+    }
+    void RestartLevel()
+    {
+        _isAlive = true;
+        PlayerRespawn._instance.Respawn();
     }
     void ActiveRagDoll()
     {
