@@ -61,7 +61,7 @@ public class TimeMaze : MonoBehaviour
             else
             {
                 // Nếu không đứng trên tag "Maze", không làm gì cả
-                Debug.Log("Player is not on ground with tag 'Maze'");
+               // Debug.Log("Player is not on ground with tag 'Maze'");
             }
         }
     }
@@ -76,12 +76,5 @@ public class TimeMaze : MonoBehaviour
     {
         Debug.Log("Player has died after failing to escape the maze in time.");
         _state.Death();
-        StartCoroutine(ResetLevel());
-    }
-
-    IEnumerator ResetLevel()
-    {
-        yield return new WaitForSeconds(3.5f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

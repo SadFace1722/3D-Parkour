@@ -1,63 +1,72 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerState : MonoBehaviour
 {
-    public static PlayerState _instance;
-    [SerializeField] int _health;
+    public static PlayerState Instance { get; private set; }
+    [SerializeField] private int _health;
+    [SerializeField] private DragDoll _dragDoll;
+    public bool IsAlive { get; private set; } = true;
 
-    [SerializeField] DragDoll _dragDoll;
-    public bool _isAlive;
     private void Awake()
     {
-        if (_instance == null)
+        IsAlive = true;
+        if (Instance == null)
         {
-            _instance = this;
+            Instance = this;
         }
     }
-    void Start()
+
+    private void Start()
     {
         _health = 100;
-        _isAlive = true;
         _dragDoll = GetComponent<DragDoll>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (_health <= 0)
         {
-            _isAlive = false;
+            Death();
         }
         ActiveRagDoll();
     }
-    public void TakeDamge(int _amount)
+
+    public void TakeDamage(int amount)
     {
-        _health -= _amount;
+        _health -= amount;
         if (_health <= 0)
         {
             _health = 0;
         }
     }
+
     public void Death()
     {
-        _isAlive = false;
+        if (!IsAlive) return; // Nếu đã chết thì không làm gì thêm
+        IsAlive = false;
         _dragDoll.EnableRagdoll();
-        Invoke("RestartLevel", 3f);
+        Invoke("RestartLevel", 1.5f);
     }
-    void RestartLevel()
+
+    private void RestartLevel()
     {
-        _isAlive = true;
-        PlayerRespawn._instance.Respawn();
+        IsAlive = true;
+        
+        // Kiểm tra xem có save point không, gọi phương thức respawn tương ứng
+        bool hasSavedPoint = PlayerPrefs.HasKey("PlayerPosX") &&
+                             PlayerPrefs.HasKey("PlayerPosY") &&
+                             PlayerPrefs.HasKey("PlayerPosZ");
+                             
+        PlayerRespawn.Instance.OnPlayerDeath(hasSavedPoint);
     }
-    void ActiveRagDoll()
+
+    private void ActiveRagDoll()
     {
-        if (_isAlive)
+        if (IsAlive)
         {
             _dragDoll.DisableRagdoll();
         }
-        else if (!_isAlive)
+        else
         {
             _dragDoll.EnableRagdoll();
         }

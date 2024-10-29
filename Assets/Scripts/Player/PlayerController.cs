@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController _instance;
     [SerializeField] PlayerState _state;
-    [SerializeField] CharacterController _controller;
+    public CharacterController _controller;
     [SerializeField] Camera _cam;
     [SerializeField] RayChecker _ray;
     public bool _isGrounded, _isFalling, _isMoving, _isClimbing, _isHideCursor;
@@ -14,6 +15,10 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        if (_instance == null)
+        {
+            _instance = this;
+        }
         _controller = GetComponent<CharacterController>();
         _cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         _ray = GameObject.Find("Main Camera").GetComponent<RayChecker>();
@@ -28,7 +33,7 @@ public class PlayerController : MonoBehaviour
             _isMoving = _isGrounded && _Hor.sqrMagnitude > 0.1f;
             _isFalling = !_isGrounded && _Ver.sqrMagnitude > 0.1f;
 
-            if (_state._isAlive)
+            if (_state.IsAlive)
             {
                 HandleInput();
                 HandleMove();
@@ -92,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
     public void HandleJump()
     {
-        if (_isGrounded && _state._isAlive)
+        if (_isGrounded && _state.IsAlive)
         {
             _Ver.y = _jumpForce;
         }
@@ -116,30 +121,30 @@ public class PlayerController : MonoBehaviour
 
     void HandleClimb()
     {
-        if(Stair._instance!=null)
+        if (Stair._instance != null)
         {
             if (Stair._instance.OnStair && _ray.CanTouchObject())
-        {
-            _isClimbing = true;
-            _Ver.y = 0;
+            {
+                _isClimbing = true;
+                _Ver.y = 0;
 
-            if (z > 0)
-            {
-                _Ver.y = _climpSpeed;
-            }
-            else if (z < 0)
-            {
-                _Ver.y = -_climpSpeed;
+                if (z > 0)
+                {
+                    _Ver.y = _climpSpeed;
+                }
+                else if (z < 0)
+                {
+                    _Ver.y = -_climpSpeed;
+                }
+                else
+                {
+                    _Ver.y = 0;
+                }
             }
             else
             {
-                _Ver.y = 0;
+                _isClimbing = false;
             }
-        }
-        else
-        {
-            _isClimbing = false;
-        }
         }
     }
 }

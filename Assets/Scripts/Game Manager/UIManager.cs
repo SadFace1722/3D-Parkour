@@ -16,17 +16,5 @@ public class UIManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            ResetAllData();
-        }
-    }
-    void ResetAllData()
-    {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-        Debug.Log("All player data has been reset.");
-    }
+    
 }

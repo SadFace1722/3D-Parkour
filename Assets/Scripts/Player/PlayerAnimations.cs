@@ -60,7 +60,7 @@ public class PlayerAnimations : MonoBehaviour
     }
     void DeathAnim()
     {
-        _anim.SetBool("Death", !_state._isAlive);
+        _anim.SetBool("Death", !_state.IsAlive);
     }
     void ClimbAnim()
     {
