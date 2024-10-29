@@ -56,12 +56,12 @@ public class TimeMaze : MonoBehaviour
                     timeText.gameObject.SetActive(true); // Hiển thị UI Text
                 }
                 isInMaze = true; // Đánh dấu là đang ở trong maze
-                Debug.Log($"Player is standing on ground with tag 'Maze'.");
+                // Debug.Log($"Player is standing on ground with tag 'Maze'.");
             }
             else
             {
                 // Nếu không đứng trên tag "Maze", không làm gì cả
-                Debug.Log("Player is not on ground with tag 'Maze'");
+                // Debug.Log("Player is not on ground with tag 'Maze'");
             }
         }
     }
