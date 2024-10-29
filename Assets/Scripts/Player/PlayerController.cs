@@ -116,7 +116,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleClimb()
     {
-        if (Stair._instance.OnStair && _ray.CanTouchObject())
+        if(Stair._instance!=null)
+        {
+            if (Stair._instance.OnStair && _ray.CanTouchObject())
         {
             _isClimbing = true;
             _Ver.y = 0;
@@ -137,6 +139,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             _isClimbing = false;
+        }
         }
     }
 }

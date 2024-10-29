@@ -64,22 +64,25 @@ public class PlayerAnimations : MonoBehaviour
     }
     void ClimbAnim()
     {
-        if (Stair._instance.OnStair == true && _ray.CanTouchObject())
+        if (Stair._instance != null)
         {
-            _anim.SetLayerWeight(_climbIndexAnim, 1);
-
-            if (_playerController._Ver.sqrMagnitude > 0.1)
+            if (Stair._instance.OnStair == true && _ray.CanTouchObject())
             {
-                _anim.SetInteger("Mode", 1);
+                _anim.SetLayerWeight(_climbIndexAnim, 1);
+
+                if (_playerController._Ver.sqrMagnitude > 0.1)
+                {
+                    _anim.SetInteger("Mode", 1);
+                }
+                else
+                {
+                    _anim.SetInteger("Mode", 0);
+                }
             }
             else
             {
-                _anim.SetInteger("Mode", 0);
+                _anim.SetLayerWeight(_climbIndexAnim, 0);
             }
-        }
-        else
-        {
-            _anim.SetLayerWeight(_climbIndexAnim, 0);
         }
     }
 }
