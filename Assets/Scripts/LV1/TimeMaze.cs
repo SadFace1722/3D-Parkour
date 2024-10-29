@@ -2,41 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // Thêm thư viện cho UI
+using UnityEngine.UI;
 
 public class TimeMaze : MonoBehaviour
 {
     [SerializeField] private float rayDistance = 1.5f; // Khoảng cách raycast
-    [SerializeField] private float maxEscapeTime = 30f; // Thời gian tối đa để thoát (có thể chỉnh sửa trong Inspector)
+    [SerializeField] private float maxEscapeTime = 30f; // Thời gian tối đa để thoát
 
-    private float startTime; // Thời gian bắt đầu
-    private float elapsedTime = 0f; // Thời gian đã trôi qua
-    private bool isInMaze = false; // Biến kiểm tra có đang ở trong vùng maze không
+    private float remainingTime; // Thời gian còn lại
+    private bool isInMaze = false; // Kiểm tra có ở trong vùng maze không
     PlayerState _state;
 
-    [SerializeField] private Text timeText; // UI Text để hiển thị thời gian đã trôi qua
+    [SerializeField] private Text timeText; // UI Text để hiển thị thời gian còn lại
 
     void Start()
     {
         _state = GameObject.Find("Player").GetComponent<PlayerState>();
-        // Ẩn UI Text ban đầu
-        timeText.gameObject.SetActive(false);
+        remainingTime = maxEscapeTime; // Khởi tạo thời gian còn lại
+        timeText.gameObject.SetActive(false); // Ẩn UI Text ban đầu
     }
 
     void Update()
     {
         CheckGroundTag();
 
-        // Cập nhật thời gian đã trôi qua chỉ khi đã bắt đầu
+        // Cập nhật thời gian còn lại
         if (isInMaze)
         {
-            elapsedTime = Time.time - startTime; // Tính thời gian đã trôi qua
-            timeText.text = $"{elapsedTime:F2}"; // Chỉ hiển thị số mà không có chữ
+            remainingTime -= Time.deltaTime; // Giảm thời gian còn lại
+            timeText.text = $"{remainingTime:F2}"; // Hiển thị thời gian còn lại
 
             // Kiểm tra thời gian thoát khỏi mê cung
-            if (elapsedTime > maxEscapeTime)
+            if (remainingTime <= 0)
             {
-                Die(); // Gọi phương thức chết nếu vượt quá thời gian
+                Die(); // Gọi phương thức chết nếu hết thời gian
             }
         }
     }
@@ -49,27 +48,20 @@ public class TimeMaze : MonoBehaviour
             // Kiểm tra tag "Maze"
             if (hit.collider.CompareTag("Maze"))
             {
-                // Nếu đứng trong vùng maze và chưa bắt đầu tính thời gian
+                // Nếu đứng trong vùng maze
                 if (!isInMaze)
                 {
                     StartEscape(); // Bắt đầu tính thời gian
                     timeText.gameObject.SetActive(true); // Hiển thị UI Text
                 }
                 isInMaze = true; // Đánh dấu là đang ở trong maze
-                // Debug.Log($"Player is standing on ground with tag 'Maze'.");
-            }
-            else
-            {
-                // Nếu không đứng trên tag "Maze", không làm gì cả
-               // Debug.Log("Player is not on ground with tag 'Maze'");
-                // Debug.Log("Player is not on ground with tag 'Maze'");
             }
         }
     }
 
     public void StartEscape()
     {
-        startTime = Time.time; // Ghi lại thời gian bắt đầu
+        remainingTime = maxEscapeTime; // Khởi động lại thời gian
         Debug.Log("Started escaping the maze.");
     }
 
@@ -77,5 +69,11 @@ public class TimeMaze : MonoBehaviour
     {
         Debug.Log("Player has died after failing to escape the maze in time.");
         _state.Death();
+    }
+
+    public void AddTime(float amount)
+    {
+        remainingTime += amount; // Tăng thời gian còn lại
+        Debug.Log($"Thời gian đã được tăng thêm: {amount} giây.");
     }
 }
