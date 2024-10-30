@@ -6,7 +6,38 @@ using UnityEngine.UI;
 public class InteractionUI : MonoBehaviour
 {
     [SerializeField] private GameObject uiImage; // UI Image sẽ bật khi nhấn E
+    [SerializeField] private Transform door; // Đối tượng cửa sẽ di chuyển
+    [SerializeField] private float moveDistance = 5f; // Khoảng cách cửa di chuyển trên trục X
+    [SerializeField] private Transform player; // Tham chiếu đến đối tượng Player
+
     private bool isInRange = false;
+    private bool hasActivated = false; // Đã thực hiện tương tác chưa
+
+    // Hàm khóa tương tác, gọi từ Keypad khi mật khẩu đúng
+    public void LockInteraction()
+    {
+        hasActivated = true;
+        Debug.Log("Phím E đã bị vô hiệu hóa");
+        MoveDoor(); // Di chuyển cửa khi khóa tương tác
+        // Tắt UI nếu đã khóa tương tác
+        if (uiImage.activeSelf)
+        {
+            uiImage.SetActive(false);
+        }
+    }
+
+    public void MoveDoor() // Hàm để di chuyển cửa
+    {
+        if (door != null)
+        {
+            door.position += new Vector3(moveDistance, 0, 0);
+            Debug.Log("Cửa đã di chuyển sang phải.");
+        }
+        else
+        {
+            Debug.Log("Không tìm thấy đối tượng cửa.");
+        }
+    }
 
     void Start()
     {
@@ -21,54 +52,55 @@ public class InteractionUI : MonoBehaviour
 
     void Update()
     {
-        // Kiểm tra nếu người chơi đang trong phạm vi và nhấn E
-        if (isInRange && Input.GetKeyDown(KeyCode.E))
+        // Kiểm tra nếu người chơi trong phạm vi và chưa bị khóa
+        if (isInRange && !hasActivated)
         {
-            ShowUI();
+            // Chỉ bật UI khi nhấn E
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                ToggleUI();
+            }
+        }
+        else if (isInRange && hasActivated && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("Phím E đã bị vô hiệu hóa, không thể bật UI");
         }
     }
 
-    private void ShowUI()
+    private void ToggleUI()
     {
-        // Bật UI, hiển thị con trỏ và khóa màn hình
-        if (uiImage != null)
+        // Đổi trạng thái UI chỉ khi đang trong phạm vi
+        if (isInRange && uiImage != null)
         {
-            uiImage.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
-            // Vô hiệu hóa điều khiển của Player
-            // (nếu bạn có script điều khiển player thì nên tắt nó đi)
-            Time.timeScale = 0f; // Dừng thời gian trong game
+            bool isActive = uiImage.activeSelf;
+            uiImage.SetActive(!isActive);
+            Cursor.lockState = isActive ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isActive;
         }
     }
 
-    private void HideUI()
+    private void UpdateIsInRange()
     {
-        // Tắt UI và khóa lại con trỏ, mở lại màn hình
-        if (uiImage != null)
+        if (player != null)
         {
-            uiImage.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            Time.timeScale = 1f; // Bật lại thời gian trong game
+            // Kiểm tra khoảng cách giữa player và InteractionUI
+            float distance = Vector3.Distance(player.position, transform.position);
+            bool wasInRange = isInRange; // Lưu trạng thái trước đó
+
+            isInRange = distance < 3f; // Thay đổi giá trị 3f theo yêu cầu của bạn
+
+            // Tắt hoặc bật UI dựa trên trạng thái isInRange
+            if (wasInRange && !isInRange && uiImage.activeSelf)
+            {
+                uiImage.SetActive(false); // Tắt UI nếu Player đi ra ngoài
+                Cursor.lockState = CursorLockMode.Locked; // Khóa con trỏ chuột
+                Cursor.visible = false; // Ẩn con trỏ chuột
+            }
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    void FixedUpdate()
     {
-        if (other.CompareTag("Player"))
-        {
-            isInRange = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isInRange = false;
-            HideUI();
-        }
+        UpdateIsInRange(); // Cập nhật trạng thái isInRange
     }
 }
