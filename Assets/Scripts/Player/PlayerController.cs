@@ -58,15 +58,24 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            HideAndShowCursor();
+            ToggleCursorVisibility();
         }
 
-        _camF = _cam.transform.forward.normalized;
-        _camR = _cam.transform.right.normalized;
+        // Chỉ lấy đầu vào điều khiển camera khi con trỏ chuột bị ẩn
+        if (_isHideCursor)
+        {
+            _camF = _cam.transform.forward.normalized;
+            _camR = _cam.transform.right.normalized;
 
-        _camF.y = 0;
-        _camR.y = 0;
-        _Hor = (_camF * z + _camR * x).normalized;
+            _camF.y = 0;
+            _camR.y = 0;
+            _Hor = (_camF * z + _camR * x).normalized;
+        }
+        else
+        {
+            // Nếu con trỏ hiện, không lấy đầu vào điều khiển camera
+            _Hor = Vector3.zero;
+        }
     }
 
     void HandleMove()
@@ -103,21 +112,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void HideAndShowCursor()
+    void ToggleCursorVisibility()
     {
         _isHideCursor = !_isHideCursor;
-        if (_isHideCursor)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        Cursor.lockState = _isHideCursor ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !_isHideCursor;
     }
-
 
     void HandleClimb()
     {
