@@ -24,34 +24,19 @@ public class InteractionUI : MonoBehaviour
         // Kiểm tra nếu người chơi đang trong phạm vi và nhấn E
         if (isInRange && Input.GetKeyDown(KeyCode.E))
         {
-            ShowUI();
+            ToggleUI();
         }
     }
 
-    private void ShowUI()
+    private void ToggleUI()
     {
-        // Bật UI, hiển thị con trỏ và khóa màn hình
+        // Đổi trạng thái UI và con trỏ chuột
         if (uiImage != null)
         {
-            uiImage.SetActive(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
-            // Vô hiệu hóa điều khiển của Player
-            // (nếu bạn có script điều khiển player thì nên tắt nó đi)
-            Time.timeScale = 0f; // Dừng thời gian trong game
-        }
-    }
-
-    private void HideUI()
-    {
-        // Tắt UI và khóa lại con trỏ, mở lại màn hình
-        if (uiImage != null)
-        {
-            uiImage.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            Time.timeScale = 1f; // Bật lại thời gian trong game
+            bool isActive = uiImage.activeSelf;
+            uiImage.SetActive(!isActive);
+            Cursor.lockState = isActive ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isActive;
         }
     }
 
@@ -68,7 +53,9 @@ public class InteractionUI : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isInRange = false;
-            HideUI();
+            uiImage.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
 }
