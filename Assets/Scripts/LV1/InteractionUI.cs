@@ -6,37 +6,45 @@ using UnityEngine.UI;
 public class InteractionUI : MonoBehaviour
 {
     [SerializeField] private GameObject uiImage; // UI Image sẽ bật khi nhấn E
+    [SerializeField] private Transform door; // Đối tượng cửa sẽ di chuyển
+    [SerializeField] private float moveDistance = 5f; // Khoảng cách cửa di chuyển trên trục X
     private bool isInRange = false;
+    private bool hasActivated = false; // Đã thực hiện tương tác chưa
+
+    public void MoveDoor() // Hàm công khai để gọi khi mật khẩu đúng
+    {
+        if (door != null)
+        {
+            door.position += new Vector3(moveDistance, 0, 0);
+            hasActivated = true; // Khóa lại phím E
+            ToggleUI(false); // Tắt UI
+        }
+    }
 
     void Start()
     {
-        // Đảm bảo UI ban đầu bị tắt
         if (uiImage != null)
             uiImage.SetActive(false);
 
-        // Ẩn con trỏ chuột ban đầu
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     void Update()
     {
-        // Kiểm tra nếu người chơi đang trong phạm vi và nhấn E
-        if (isInRange && Input.GetKeyDown(KeyCode.E))
+        if (isInRange && !hasActivated && Input.GetKeyDown(KeyCode.E))
         {
-            ToggleUI();
+            ToggleUI(true);
         }
     }
 
-    private void ToggleUI()
+    private void ToggleUI(bool state)
     {
-        // Đổi trạng thái UI và con trỏ chuột
         if (uiImage != null)
         {
-            bool isActive = uiImage.activeSelf;
-            uiImage.SetActive(!isActive);
-            Cursor.lockState = isActive ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = !isActive;
+            uiImage.SetActive(state);
+            Cursor.lockState = state ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = state;
         }
     }
 
@@ -53,9 +61,7 @@ public class InteractionUI : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isInRange = false;
-            uiImage.SetActive(false);
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            ToggleUI(false);
         }
     }
 }
