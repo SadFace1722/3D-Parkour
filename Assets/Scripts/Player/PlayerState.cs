@@ -7,6 +7,9 @@ public class PlayerState : MonoBehaviour
     [SerializeField] private DragDoll _dragDoll;
     public bool IsAlive { get; private set; } = true;
 
+    // Biến để lưu vị trí respawn
+    private Vector3 respawnPosition;
+
     private void Awake()
     {
         IsAlive = true;
@@ -20,6 +23,9 @@ public class PlayerState : MonoBehaviour
     {
         _health = 100;
         _dragDoll = GetComponent<DragDoll>();
+
+        // Lưu vị trí mặc định (có thể thay đổi tùy theo thiết kế game)
+        respawnPosition = new Vector3(0, 1, 0); // Ví dụ: vị trí mặc định là (0, 1, 0)
     }
 
     private void Update()
@@ -42,23 +48,21 @@ public class PlayerState : MonoBehaviour
 
     public void Death()
     {
-        if (!IsAlive) return; // Nếu đã chết thì không làm gì thêm
+        if (!IsAlive) return;
         IsAlive = false;
         _dragDoll.EnableRagdoll();
-        Invoke("RestartLevel", 1.5f);
+        Invoke("ReSpawn", 1.5f);
     }
 
-    private void RestartLevel()
+    private void ReSpawn()
     {
         IsAlive = true;
-        
-        // Kiểm tra xem có save point không, gọi phương thức respawn tương ứng
-        bool hasSavedPoint = PlayerPrefs.HasKey("PlayerPosX") &&
-                             PlayerPrefs.HasKey("PlayerPosY") &&
-                             PlayerPrefs.HasKey("PlayerPosZ");
-                             
-        PlayerRespawn.Instance.OnPlayerDeath(hasSavedPoint);
+        _health = 100;
+
+        // Gọi hàm LoadPlayerPosition từ PlayerController để nạp lại vị trí
+        PlayerController._instance.LoadPlayerPosition();
     }
+
 
     private void ActiveRagDoll()
     {
