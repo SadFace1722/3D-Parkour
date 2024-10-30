@@ -20,12 +20,16 @@ public class Keypad : MonoBehaviour
     {
         if (Ans.text == Answer)
         {
+            // Nếu đúng mã, tắt UI
             uiImage.SetActive(false);
-            Ans.text = "";
+            Ans.text = ""; // Xóa nội dung sau khi hoàn tất
 
+            // Gọi hàm để khóa phím E trong InteractionUI
             if (interactionUI != null)
             {
-                interactionUI.MoveDoor(); // Gọi hàm MoveDoor khi mật khẩu đúng
+                interactionUI.LockInteraction(); // Khóa phím E sau khi nhập đúng
+                interactionUI.MoveDoor(); // Di chuyển cửa sau khi khóa phím E
+                Debug.Log("Mật khẩu đúng. UI đã tắt, phím E bị vô hiệu hóa và cửa đã di chuyển.");
             }
         }
         else
@@ -37,6 +41,7 @@ public class Keypad : MonoBehaviour
 
     public void DeleteLast()
     {
+        // Xóa ký tự cuối cùng trong Ans.text
         if (Ans.text.Length > 0)
         {
             Ans.text = Ans.text.Substring(0, Ans.text.Length - 1);
@@ -45,6 +50,7 @@ public class Keypad : MonoBehaviour
 
     private IEnumerator ClearText()
     {
+        // Đợi một thời gian ngắn trước khi xóa mã vừa nhập
         yield return new WaitForSeconds(1f);
         Ans.text = "";
     }

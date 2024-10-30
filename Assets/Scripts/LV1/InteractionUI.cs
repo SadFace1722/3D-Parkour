@@ -11,40 +11,59 @@ public class InteractionUI : MonoBehaviour
     private bool isInRange = false;
     private bool hasActivated = false; // Đã thực hiện tương tác chưa
 
-    public void MoveDoor() // Hàm công khai để gọi khi mật khẩu đúng
+    // Hàm khóa tương tác, gọi từ Keypad khi mật khẩu đúng
+    public void LockInteraction()
+    {
+        hasActivated = true;
+        Debug.Log("Phím E đã bị vô hiệu hóa");
+    }
+
+    public void MoveDoor() // Hàm để di chuyển cửa
     {
         if (door != null)
         {
             door.position += new Vector3(moveDistance, 0, 0);
-            hasActivated = true; // Khóa lại phím E
-            ToggleUI(false); // Tắt UI
+            Debug.Log("Cửa đã di chuyển sang phải.");
+        }
+        else
+        {
+            Debug.Log("Không tìm thấy đối tượng cửa.");
         }
     }
 
     void Start()
     {
+        // Đảm bảo UI ban đầu bị tắt
         if (uiImage != null)
             uiImage.SetActive(false);
 
+        // Ẩn con trỏ chuột ban đầu
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     void Update()
     {
+        // Kiểm tra nếu người chơi trong phạm vi và nhấn E, và chưa bị khóa
         if (isInRange && !hasActivated && Input.GetKeyDown(KeyCode.E))
         {
-            ToggleUI(true);
+            ToggleUI();
+        }
+        else if (isInRange && hasActivated && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("Phím E đã bị vô hiệu hóa, không thể bật UI");
         }
     }
 
-    private void ToggleUI(bool state)
+    private void ToggleUI()
     {
+        // Đổi trạng thái UI và con trỏ chuột
         if (uiImage != null)
         {
-            uiImage.SetActive(state);
-            Cursor.lockState = state ? CursorLockMode.None : CursorLockMode.Locked;
-            Cursor.visible = state;
+            bool isActive = uiImage.activeSelf;
+            uiImage.SetActive(!isActive);
+            Cursor.lockState = isActive ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isActive;
         }
     }
 
@@ -61,7 +80,10 @@ public class InteractionUI : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isInRange = false;
-            ToggleUI(false);
+            if (uiImage.activeSelf)
+            {
+                ToggleUI();
+            }
         }
     }
 }
