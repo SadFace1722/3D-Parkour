@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI; // Thêm namespace để sử dụng UI
 
 public class ItemMovement : MonoBehaviour
 {
@@ -22,10 +22,22 @@ public class ItemMovement : MonoBehaviour
     // Biến theo dõi chỉ số vật phẩm hiện tại
     private static int currentItemIndex = 0; // Khởi tạo từ 0 cho item1
 
+    // Biến password
+    private static string password = ""; // Lưu trữ chuỗi password
+
+    // Tham chiếu tới UI Text để hiển thị password cuối cùng
+    public Text passwordText; // Gán đối tượng Text trong Inspector
+
     void Start()
     {
         // Lưu lại vị trí ban đầu
         startPosition = transform.position;
+
+        // Đảm bảo passwordText trống lúc đầu
+        if (passwordText != null)
+        {
+            passwordText.text = "";
+        }
     }
 
     void Update()
@@ -50,6 +62,9 @@ public class ItemMovement : MonoBehaviour
                 collectedItems.Add(this.gameObject);
                 Debug.Log("Player đã thêm vào: " + gameObject.name);
 
+                // Thêm số tương ứng với vật phẩm vào password
+                UpdatePassword();
+
                 // Tăng thời gian nếu vật phẩm hợp lệ
                 AddTimeToPlayer();
 
@@ -60,8 +75,13 @@ public class ItemMovement : MonoBehaviour
                 if (currentItemIndex >= 3) // Giả sử chỉ có 3 vật phẩm
                 {
                     Debug.Log("Đã thu thập đủ vật phẩm!");
-                    // Thực hiện hành động nào đó khi thu thập đủ
-                    // Bạn có thể mở cửa hoặc chuyển cảnh ở đây
+                    Debug.Log("Password cuối cùng: " + password); // Chỉ hiện khi đủ 3 vật phẩm
+
+                    // Hiển thị password trên UI Text
+                    if (passwordText != null)
+                    {
+                        passwordText.text = "Password: " + password;
+                    }
                 }
 
                 // Xóa vật phẩm khỏi scene
@@ -71,6 +91,23 @@ public class ItemMovement : MonoBehaviour
             {
                 Debug.Log("Vật phẩm không đúng thứ tự: " + gameObject.name);
             }
+        }
+    }
+
+    private void UpdatePassword()
+    {
+        // Thêm giá trị tương ứng vào password dựa trên tag của vật phẩm
+        switch (gameObject.tag)
+        {
+            case "item1":
+                password += "3"; // Thêm "3" vào password
+                break;
+            case "item2":
+                password += "5"; // Thêm "5" vào password
+                break;
+            case "item3":
+                password += "2"; // Thêm "2" vào password
+                break;
         }
     }
 
