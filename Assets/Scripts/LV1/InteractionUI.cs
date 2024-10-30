@@ -8,6 +8,8 @@ public class InteractionUI : MonoBehaviour
     [SerializeField] private GameObject uiImage; // UI Image sẽ bật khi nhấn E
     [SerializeField] private Transform door; // Đối tượng cửa sẽ di chuyển
     [SerializeField] private float moveDistance = 5f; // Khoảng cách cửa di chuyển trên trục X
+    [SerializeField] private Transform player; // Tham chiếu đến đối tượng Player
+
     private bool isInRange = false;
     private bool hasActivated = false; // Đã thực hiện tương tác chưa
 
@@ -16,6 +18,12 @@ public class InteractionUI : MonoBehaviour
     {
         hasActivated = true;
         Debug.Log("Phím E đã bị vô hiệu hóa");
+        MoveDoor(); // Di chuyển cửa khi khóa tương tác
+        // Tắt UI nếu đã khóa tương tác
+        if (uiImage.activeSelf)
+        {
+            uiImage.SetActive(false);
+        }
     }
 
     public void MoveDoor() // Hàm để di chuyển cửa
@@ -44,10 +52,14 @@ public class InteractionUI : MonoBehaviour
 
     void Update()
     {
-        // Kiểm tra nếu người chơi trong phạm vi và nhấn E, và chưa bị khóa
-        if (isInRange && !hasActivated && Input.GetKeyDown(KeyCode.E))
+        // Kiểm tra nếu người chơi trong phạm vi và chưa bị khóa
+        if (isInRange && !hasActivated)
         {
-            ToggleUI();
+            // Chỉ bật UI khi nhấn E
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                ToggleUI();
+            }
         }
         else if (isInRange && hasActivated && Input.GetKeyDown(KeyCode.E))
         {
@@ -57,8 +69,8 @@ public class InteractionUI : MonoBehaviour
 
     private void ToggleUI()
     {
-        // Đổi trạng thái UI và con trỏ chuột
-        if (uiImage != null)
+        // Đổi trạng thái UI chỉ khi đang trong phạm vi
+        if (isInRange && uiImage != null)
         {
             bool isActive = uiImage.activeSelf;
             uiImage.SetActive(!isActive);
@@ -67,23 +79,28 @@ public class InteractionUI : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void UpdateIsInRange()
     {
-        if (other.CompareTag("Player"))
+        if (player != null)
         {
-            isInRange = true;
+            // Kiểm tra khoảng cách giữa player và InteractionUI
+            float distance = Vector3.Distance(player.position, transform.position);
+            bool wasInRange = isInRange; // Lưu trạng thái trước đó
+
+            isInRange = distance < 3f; // Thay đổi giá trị 3f theo yêu cầu của bạn
+
+            // Tắt hoặc bật UI dựa trên trạng thái isInRange
+            if (wasInRange && !isInRange && uiImage.activeSelf)
+            {
+                uiImage.SetActive(false); // Tắt UI nếu Player đi ra ngoài
+                Cursor.lockState = CursorLockMode.Locked; // Khóa con trỏ chuột
+                Cursor.visible = false; // Ẩn con trỏ chuột
+            }
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    void FixedUpdate()
     {
-        if (other.CompareTag("Player"))
-        {
-            isInRange = false;
-            if (uiImage.activeSelf)
-            {
-                ToggleUI();
-            }
-        }
+        UpdateIsInRange(); // Cập nhật trạng thái isInRange
     }
 }
