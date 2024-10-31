@@ -180,10 +180,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6412015609179861189}
   - component: {fileID: 224387586264501926}
-  - component: {fileID: 2679814837688308154}
   m_Layer: 0
   m_Name: Check Point Flag
-  m_TagString: Untagged
+  m_TagString: SavePoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -226,16 +225,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.0514748, y: 2.4805365, z: 2.4575207}
   m_Center: {x: 0.033038974, y: -0.33369613, z: 0.053693175}
---- !u!114 &2679814837688308154
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7286866790133195078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cd23cea41eb3f843b0a3e404a5fa5cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 0}

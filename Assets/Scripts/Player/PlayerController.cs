@@ -1,4 +1,5 @@
 using UnityEngine;
+using Cinemachine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -6,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] PlayerState _state;
     public CharacterController _controller;
     [SerializeField] Camera _cam;
+    [SerializeField] CinemachineFreeLook _freeLook;
     [SerializeField] RayChecker _ray;
     public bool _isGrounded, _isFalling, _isMoving, _isClimbing, _isHideCursor;
 
@@ -22,7 +24,15 @@ public class PlayerController : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         _cam = GameObject.Find("Main Camera").GetComponent<Camera>();
         _ray = GameObject.Find("Main Camera").GetComponent<RayChecker>();
+        _freeLook = GameObject.Find("3rd Camera").GetComponent<CinemachineFreeLook>();
         _state = GetComponent<PlayerState>();
+
+        _isHideCursor = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // Khi khởi tạo, nạp vị trí người chơi nếu có
+        LoadPlayerPosition();
     }
 
     private void Update()
@@ -58,24 +68,15 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            ToggleCursorVisibility();
+            HideAndShowCursor();
         }
 
-        // Chỉ lấy đầu vào điều khiển camera khi con trỏ chuột bị ẩn
-        if (_isHideCursor)
-        {
-            _camF = _cam.transform.forward.normalized;
-            _camR = _cam.transform.right.normalized;
+        _camF = _cam.transform.forward.normalized;
+        _camR = _cam.transform.right.normalized;
 
-            _camF.y = 0;
-            _camR.y = 0;
-            _Hor = (_camF * z + _camR * x).normalized;
-        }
-        else
-        {
-            // Nếu con trỏ hiện, không lấy đầu vào điều khiển camera
-            _Hor = Vector3.zero;
-        }
+        _camF.y = 0;
+        _camR.y = 0;
+        _Hor = (_camF * z + _camR * x).normalized;
     }
 
     void HandleMove()
@@ -112,11 +113,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void ToggleCursorVisibility()
+    void HideAndShowCursor()
     {
         _isHideCursor = !_isHideCursor;
-        Cursor.lockState = _isHideCursor ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !_isHideCursor;
+        if (_isHideCursor)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            _freeLook.m_XAxis.m_InputAxisName = "Mouse X";
+            _freeLook.m_YAxis.m_InputAxisName = "Mouse Y";
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            _freeLook.m_XAxis.m_InputAxisValue = 0;
+            _freeLook.m_YAxis.m_InputAxisValue = 0;
+
+            _freeLook.m_XAxis.m_InputAxisName = null;
+            _freeLook.m_YAxis.m_InputAxisName = null;
+        }
     }
 
     void HandleClimb()
@@ -145,6 +162,28 @@ public class PlayerController : MonoBehaviour
             {
                 _isClimbing = false;
             }
+        }
+    }
+
+    // Lưu vị trí người chơi
+    public void SavePlayerPosition()
+    {
+        GameManager.Instance.SavePlayerPosition(transform.position);
+    }
+
+    // Nạp vị trí người chơi từ GameManager
+    public void LoadPlayerPosition()
+    {
+        transform.position = GameManager.Instance.LoadPlayerPosition();
+    }
+
+    // Gọi hàm này khi chạm vào save point
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("SavePoint"))
+        {
+            SavePlayerPosition();
+            Debug.Log("Player has saved the position at: " + transform.position);
         }
     }
 }

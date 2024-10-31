@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -84,9 +83,15 @@ public class CutsceneManager : MonoBehaviour
         cutscenes[currentCutsceneIndex].SetActive(false);
         currentCutsceneIndex++;
 
+        // Kiểm tra nếu còn cutscene nào khác
         if (currentCutsceneIndex < cutscenes.Length)
         {
             ToggleCutscene(currentCutsceneIndex);
+        }
+        else
+        {
+            // Gọi hàm CompleteLevel từ GameManager khi tất cả cutscene đã hoàn thành
+            GameManager.Instance.CompleteLevel(); 
         }
     }
 
