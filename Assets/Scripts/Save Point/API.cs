@@ -20,53 +20,6 @@ public class API : MonoBehaviour
         }
     }
 
-    // Phương thức đăng ký
-    public IEnumerator Register(string username, string password)
-    {
-        UserData data = new UserData { username = username, password = password };
-        string jsonData = JsonUtility.ToJson(data);
-
-        UnityWebRequest request = new UnityWebRequest($"{baseUrl}/register", "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Đăng ký thành công!");
-        }
-        else
-        {
-            Debug.LogError("Lỗi khi đăng ký: " + request.error);
-        }
-    }
-
-    // Phương thức đăng nhập
-    public IEnumerator Login(string username, string password)
-    {
-        UserData data = new UserData { username = username, password = password };
-        string jsonData = JsonUtility.ToJson(data);
-
-        UnityWebRequest request = new UnityWebRequest($"{baseUrl}/login", "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Đăng nhập thành công!");
-        }
-        else
-        {
-            Debug.LogError("Lỗi khi đăng nhập: " + request.error);
-        }
-    }
 
     // Phương thức lưu vị trí
     public IEnumerator SavePlayerPosition(int idUser, float x_position, float y_position, float z_position)
@@ -115,13 +68,6 @@ public class API : MonoBehaviour
             }
         }
     }
-}
-
-[System.Serializable]
-public class UserData
-{
-    public string username;
-    public string password;
 }
 
 
