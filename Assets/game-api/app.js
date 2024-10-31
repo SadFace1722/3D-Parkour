@@ -59,6 +59,25 @@ app.post('/save-position', async (req, res) => {
         res.status(500).send('Có lỗi xảy ra!');
     }
 });
+// API lấy vị trí cuối cùng
+app.get('/get-last-position/:idUser', async (req, res) => {
+    try {
+        const { idUser } = req.params;
+
+        const lastPosition = await Position.findOne({ idUser })
+            .sort({ timestamp: -1 }) // Sắp xếp giảm dần theo timestamp
+            .limit(1); // Giới hạn chỉ lấy một kết quả
+
+        if (!lastPosition) {
+            return res.status(404).json({ message: 'Vị trí không tìm thấy' });
+        }
+
+        res.json(lastPosition);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Lỗi máy chủ' });
+    }
+});
 
 // Khởi động server
 app.listen(3000, () => {
